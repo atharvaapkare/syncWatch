@@ -70,8 +70,9 @@ wss.on('connection', ws => {
           src.url = cleanUrl(m.url);
           if (!src.url) return;
         }
-        r.source = src;
-        r.state = { playing: false, time: 0, at: Date.now() };
+       const same = r.source && r.source.mode === 'file' && src.mode === 'file' && r.source.label === src.label;
+r.source = src;
+if (!same) r.state = { playing: false, time: 0, at: Date.now() };
         broadcast(r, { type: 'source', source: src, state: r.state }, ws);
         break;
       }
