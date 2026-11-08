@@ -68,21 +68,27 @@
     <span class="pill" id="roomPill"></span>
     <button class="ghost" id="copyLink">Copy invite link</button>
     <span class="grow"></span>
+    <label class="pill" style="cursor:pointer">Add subtitles (.srt / .vtt)<input id="subIn" type="file" accept=".srt,.vtt" hidden></label>
     <button class="ghost" id="resync">Resync me</button>
   </header>
 
   <main>
     <div class="tabs">
       <button class="tab on" data-mode="file">My file</button>
+      <button class="tab" data-mode="stremio">Stremio / local URL</button>
       <button class="tab" data-mode="link">Video link</button>
       <button class="tab" data-mode="site">Website</button>
     </div>
 
     <div class="panel" id="p-file">
       <input id="fileIn" type="file" accept="video/*,audio/*,.mkv">
-      <input id="subIn" type="file" accept=".srt,.vtt" title="Subtitles">
+      
       <span class="note">Each person picks their own copy of the <b>same file</b>. Optionally add a .srt/.vtt subtitle file (local only). Browsers play mp4/webm/m4v best; .mkv works only if its codecs are supported.</span>
     </div>
+    <div class="panel hidden" id="p-stremio">
+  <input id="stremioIn" type="url" placeholder="http://127.0.0.1:11470/…/0" style="flex:1;min-width:220px">
+  <button id="stremioGo">Load my stream</button>
+</div>
     <div class="panel hidden" id="p-link">
       <input id="linkIn" type="url" placeholder="Direct video URL (.mp4, .webm, .m3u8)" style="flex:1;min-width:220px">
       <button id="linkGo">Load for everyone</button>
@@ -189,7 +195,7 @@ function handle(m) {
 document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   mode = t.dataset.mode;
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
-  ['file', 'link', 'site'].forEach(k => $('#p-' + k).classList.toggle('hidden', k !== mode));
+  ['file', 'stremio', 'link', 'site'].forEach(k => $('#p-' + k).classList.toggle('hidden', k !== mode));
 });
 function showTab(m) { document.querySelector(`.tab[data-mode="${m}"]`).click(); }
 function stage(which) {
@@ -222,6 +228,14 @@ $('#linkGo').onclick = () => {
   const url = $('#linkIn').value.trim(); if (!url) return;
   send({ type: 'source', mode: 'link', url, label: url });
   loadVideo(url);
+};
+
+  $('#stremioGo').onclick = () => {
+  const url = $('#stremioIn').value.trim(); if (!url) return;
+  loadVideo(url);
+  v.dataset.file = 'Stremio stream';
+  send({ type: 'source', mode: 'file', label: 'Stremio stream' });
+  sys('You loaded your Stremio stream.');
 };
 $('#siteGo').onclick = () => {
   const url = $('#siteIn').value.trim(); if (!url) return;
