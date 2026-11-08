@@ -233,8 +233,11 @@ $('#linkGo').onclick = () => {
   $('#stremioGo').onclick = () => {
   const url = $('#stremioIn').value.trim(); if (!url) return;
   loadVideo(url);
-  v.dataset.file = 'Stremio stream';
-  send({ type: 'source', mode: 'file', label: 'Stremio stream' });
+  const m = url.match(/\/([0-9a-f]{40})\/(\d+)/i);
+const label = 'Stremio ' + (m ? m[1].slice(0, 8) + '/' + m[2] : 'stream');
+v.dataset.file = label;
+send({ type: 'source', mode: 'file', label });
+
   sys('You loaded your Stremio stream.');
 };
 $('#siteGo').onclick = () => {
@@ -247,8 +250,11 @@ $('#startTogether').onclick = () => send({ type: 'countdown' });
 
 function onSource(s, live) {
   if (s.mode === 'file') {
-    showTab('file'); stage(null);
-    banner(`<b>${esc(s.by)}</b> is watching <b>${esc(s.label)}</b>.<br>Pick your own copy of the same file using the file picker above.`);
+if (v.getAttribute('src') || hls) { sys(`${s.by} is watching ${s.label}.`); return; }
+stage(null);
+banner(`<b>${esc(s.by)}</b> is watching <b>${esc(s.label)}</b>.`,
+  [['Paste my Stremio link', () => { clearBanner(); showTab('stremio'); $('#stremioIn').focus(); }],
+   ['Pick my file', () => { clearBanner(); showTab('file'); }]]);
   } else if (s.mode === 'link') {
     showTab('link'); $('#linkIn').value = s.url; loadVideo(s.url);
   } else if (s.mode === 'site') {
