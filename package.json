@@ -1,0 +1,8 @@
+{
+  "name": "syncwatch",
+  "version": "1.0.0",
+  "description": "Watch together: every device plays its own copy, only play/pause/seek are synced",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2", "ws": "^8.18.0" }
+}
